@@ -17,7 +17,7 @@ team automatically and readable by any other agent (see [Other agents](#other-ag
 Three flows, all governed by `recall/references/PROTOCOL.md`:
 
 - **RECALL** — on a reported problem, OR when starting non-trivial work (a plan, spec,
-  design, rollout, prioritization), the agent checks `.agent-learnings/REGISTRY.md` →
+  design, rollout, prioritization), the agent checks `.agent-recall/REGISTRY.md` →
   the matching domain's `INDEX.md` → the learning file(s). When several learnings match
   one situation (one symptom with multiple root causes; one task with several
   context-dependent practices), it runs their **Signals** to determine which applies
@@ -40,20 +40,20 @@ Three flows, all governed by `recall/references/PROTOCOL.md`:
 
 1. Copy the `recall/` folder into your repo at `.claude/skills/recall/`
    (or `~/.claude/skills/recall/` to enable it across all projects).
-2. That's it. The store (`.agent-learnings/`) is created automatically in the repo root
+2. That's it. The store (`.agent-recall/`) is created automatically in the repo root
    the first time a learning is saved, including a copy of PROTOCOL.md so the store is
    self-describing.
 3. Recommended: also add the one-liner below to your `CLAUDE.md` — the skill description
    handles triggering, but a standing instruction makes recall-before-debugging more
    reliable:
 
-   > Before debugging any reported error or incident, check `.agent-learnings/REGISTRY.md`
+   > Before debugging any reported error or incident, check `.agent-recall/REGISTRY.md`
    > for a prior learning (see the `recall` skill).
 
 ## Store layout (created on first save)
 
 ```
-.agent-learnings/
+.agent-recall/
 ├── PROTOCOL.md            # the rules — copied from the skill, single source of truth
 ├── REGISTRY.md            # one line per domain; always read first (hard char cap)
 ├── <domain>/
@@ -68,12 +68,12 @@ See `recall/references/EXAMPLE-{incident,practice,decision}.md` for complete exa
 ## Other agents
 
 The store is agent-agnostic: everything an agent needs is in
-`.agent-learnings/PROTOCOL.md`, which lives in your repo after first save. To make
+`.agent-recall/PROTOCOL.md`, which lives in your repo after first save. To make
 Codex, OpenCode, Cursor, Hermes, or any other agent participate, add one instruction to
 your `AGENTS.md` (or the agent's equivalent rules file):
 
 > This repo maintains an incident learning store. Before debugging any reported
-> error, and before saving any fix, read and follow `.agent-learnings/PROTOCOL.md`.
+> error, and before saving any fix, read and follow `.agent-recall/PROTOCOL.md`.
 
 That single pointer is sufficient — the protocol file itself contains the full recall,
 outcome-recording, and approval rules. (Cursor users: put the same text in a

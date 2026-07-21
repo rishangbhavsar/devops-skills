@@ -5,7 +5,7 @@
       "id": 1,
       "eval_name": "full-lifecycle-save-then-recall",
       "prompt": "hey, kubectl apply is just hanging when I try to deploy the payments service, no output for like 3 minutes. can you figure out whats going on",
-      "expected_output": "Agent checks .agent-learnings/ (empty/missing -> no recall), debugs, resolves, OFFERS to save, presents approval summary in the PROTOCOL format, writes only after 'y', creates store + registry + domain + learning file + INDEX in correct formats, separate learn() commit. Then in a follow-up same-incident prompt: recalls, announces provenance with ID/confidence/stats BEFORE applying, runs verification, updates stats.",
+      "expected_output": "Agent checks .agent-recall/ (empty/missing -> no recall), debugs, resolves, OFFERS to save, presents approval summary in the PROTOCOL format, writes only after 'y', creates store + registry + domain + learning file + INDEX in correct formats, separate learn() commit. Then in a follow-up same-incident prompt: recalls, announces provenance with ID/confidence/stats BEFORE applying, runs verification, updates stats.",
       "files": [],
       "assertions": [
         {

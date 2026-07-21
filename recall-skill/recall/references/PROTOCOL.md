@@ -1,6 +1,6 @@
 # Agent Learning Store — PROTOCOL.md (v0.5)
 
-A git-versioned knowledge base at `.agent-learnings/` of what's been learned working
+A git-versioned knowledge base at `.agent-recall/` of what's been learned working
 here — resolved incidents, proven practices, decisions with rationale — across ANY domain
 (coding, devops, product, planning, writing, data, process). Plain markdown, no runtime
 deps. Any AI agent here MUST follow this protocol.
@@ -12,7 +12,7 @@ helped, automatic), **SAVE** (write/update a learning, always human-approved).
 
 ## 1. Store layout
 ```
-.agent-learnings/
+.agent-recall/
 ├── PROTOCOL.md      # this file — single source of truth
 ├── REGISTRY.md      # domain index; ALWAYS read first
 ├── <domain>/        # areas of work, not just tech: k8s/, product/, planning/, release/
