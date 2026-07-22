@@ -1,0 +1,53 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## What this repo is
+
+A **registry of Claude Code Agent Skills for DevOps workflows** — a curated collection of
+standalone skills, each installable independently into a target repo's `.claude/skills/`. There is no
+build, lint, or test toolchain — each skill is a self-contained Markdown prompt (plus optional
+reference files) that gets copied into a target repo's `.claude/skills/` directory and invoked by
+an agent there. Changes here are validated by reading and reasoning about the prompt text, not by
+running code.
+
+## Layout
+
+- `infra-blueprint-generator/SKILL.md` — single-file skill. Generates architecture documentation
+  (`.knowledge/blueprint/`) for DevOps/IaC repos (Terraform, Ansible, Kubernetes, Helm, ArgoCD,
+  GitHub Actions). The whole skill — trigger description, config variables, and the multi-step
+  generated prompt — lives in this one file.
+- `recall-skill/` — multi-file skill (`recall/`) implementing a git-versioned, outcome-tracked
+  learning store (`.agent-recall/` in a target repo) with three learning types: incident,
+  practice, decision.
+  - `recall/SKILL.md` — trigger description + routing table; defers all actual rules to
+    `references/PROTOCOL.md`.
+  - `recall/references/PROTOCOL.md` — source of truth for every flow, format, and rule (recall,
+    record-outcome, save, supersede, confidence derivation, safety rules). Edit here, not in
+    SKILL.md, when changing behavior.
+  - `recall/references/EXAMPLE-{incident,practice,decision}.md` — canonical worked examples of
+    each learning-file format; other agents parse these formats, so don't improvise new fields.
+  - `evals/evals.json` — scenario-based evals (prompt + expected behavior + pass/fail assertions)
+    used to check the skill's behavior end-to-end; there's no runner script, evals are executed by
+    having an agent follow the prompt and grading the transcript against the assertions.
+  - `README.md` — install instructions and design rationale; keep in sync with SKILL.md/PROTOCOL.md
+    if triggering conditions or store layout change.
+
+## Conventions when editing a skill
+
+- **SKILL.md frontmatter (`name`, `description`) is the sole triggering mechanism** — the
+  description must enumerate concrete trigger phrases/situations, since agents match on it to
+  decide when to invoke the skill. When triggering feels off, tune wording here first.
+- Every skill instructs the agent to ground output in files that actually exist in the target
+  repo and to never guess (e.g. infra-blueprint-generator's "Grounding Rules": cite a file path
+  per claim, mark inferences as `Inferred:`, never invent versions or secret values). Preserve this
+  pattern in any new skill or edit.
+- Keep large, stable rule sets in a `references/*.md` file and have `SKILL.md` route to it rather
+  than duplicating rules inline (see `recall`'s SKILL.md → PROTOCOL.md split). This keeps the
+  always-loaded SKILL.md small.
+- Never have a skill store secrets — only key names and where the value lives. This is enforced
+  explicitly in `recall`'s PROTOCOL.md §9 and tested by `evals/evals.json` eval #3; carry the same
+  rule into any skill that touches config/secrets data.
+- `recall`'s file formats (frontmatter schema, INDEX.md line format, REGISTRY.md format) are parsed
+  by other agents/tools — don't change field names or structure without updating every example in
+  `references/` and the description in `README.md`.

@@ -1,4 +1,4 @@
-# Agent Learning Store — PROTOCOL.md (v0.5)
+# Agent Learning Store — PROTOCOL.md (v0.6)
 
 A git-versioned knowledge base at `.agent-recall/` of what's been learned working
 here — resolved incidents, proven practices, decisions with rationale — across ANY domain
@@ -113,6 +113,9 @@ Trigger when: the user reports a problem/error/failure (→ `incident`), OR you'
 non-trivial work with a plausible domain — plan, API design, spec, rollout, prioritization
 (→ `practice`/`decision`), OR a decision is about to be made the store may already reason about.
 
+0. **Ask first.** Unless the user explicitly invoked recall (`/recall`, "remember this",
+   "what have we learned"), ask one line before reading the store — "Want me to check the
+   recall store first? (y/n)" — and recall only on "yes". Don't read silently.
 1. **Registry** → read `REGISTRY.md`, pick 1–2 domains. No match → proceed normally (consider SAVE later).
 2. **Index** → read `<domain>/INDEX.md`; open any plausibly-matching learning. **Match on
    the event/symptom, not the resource** — a learning first recorded on service A applies
@@ -123,13 +126,19 @@ non-trivial work with a plausible domain — plan, API design, spec, rollout, pr
 4. **Announce provenance** (never apply silently):
    > "Found prior learning **k8s/L-0001** (incident, conf HIGH, 3 ok/0 fail): <summary>. Applying."
    Decisions: "Per prior decision **product/L-0003**: <decision>. Following unless you want to revisit."
-5. **Apply, then verify** against Verification / Success criteria / Revisit-when.
+5. **Recommend, then verify.** If you have access to execute the fix, apply it and verify
+   against Verification / Success criteria / Revisit-when. If you DON'T (e.g. no cluster/cloud
+   creds), present the exact commands + the verification check for the user to run — the
+   user's report is the outcome.
 6. **Record the outcome** (§6) — always.
 7. **On failure, iterate:** say it didn't hold, record the failure, proceed fresh. New
    working approach → SAVE (failure lands in the old learning's Pitfalls; classify per §7).
 
 ## 6. RECORD OUTCOME
-After applying `L-XXXX` (per stats semantics, or the user's judgment — always final):
+Trigger after applying `L-XXXX`, OR whenever the user reports that a previously recommended
+learning worked or failed — including a late report in a later session with no active task
+("that fix you suggested worked"). Stats semantics apply; the user's judgment is always final.
+0. `git pull --rebase` before editing store files.
 1. Update frontmatter `stats`: increment `applied` + (`succeeded` OR `failed`); set `last_used` today. Don't touch `updated`.
 2. On failure: append a dated line to `## Pitfalls`.
 3. Update the INDEX.md line (stats + recomputed confidence).
@@ -141,6 +150,9 @@ After applying `L-XXXX` (per stats semantics, or the user's judgment — always 
 at the natural end of work where something reusable was learned:
 > "This looks worth saving as a <type>. Run the save flow? (y/n)"
 Trivial/well-known things aren't worth saving; when in doubt, offer — the user decides.
+
+**Before writing** — `git pull --rebase`. Allocate the ID as `max(existing in domain) + 1`
+computed AFTER the pull; if the push is later rejected, re-pull and re-allocate before retrying.
 
 **Classify** — pick the `type`, dedup-check the domain INDEX (read similar titles), then one bucket:
 
@@ -161,8 +173,13 @@ Signals ending "if X instead, see L-YYYY"). Old learning misdiagnosed/obsolete �
 
 **Cross-domain:** file under the CORE subject's domain + `see_also`; never duplicate a full learning.
 
-**Approval — mandatory.** Present a summary, write ONLY after explicit "y"/"yes" ("n"/silence
-= don't write); if the user's edit changes type or bucket, re-present:
+**Generalize (incidents):** before presenting, scan the title/Signals/Fix for a specific
+resource/service name. If present, reword them to the event pattern and move the resource to
+`## Instances`. A resource-keyed learning silently fails to recall for the next resource.
+
+**Approval — mandatory.** Present a summary that includes the **literal INDEX.md line and the
+frontmatter block to be written** (so the user eyeballs the exact bytes), write ONLY after
+explicit "y"/"yes" ("n"/silence = don't write); if the user's edit changes type or bucket, re-present:
 ```
 ── Proposed learning write ─────────────────────────
 Type:     practice        Bucket: CREATE      Domain: product
@@ -171,6 +188,8 @@ Signals:  <1-line>
 Approach: <2-line summary>
 Success:  <success criteria / verification / revisit-when>
 Files:    create product/L-0004-...md; update INDEX.md
+INDEX:    L-0004 | practice | pre-mortem before committing roadmap | conf:MED | ok:1 fail:0
+Frontmatter: <the exact YAML block to be written>
 ────────────────────────────────────────────────────
 Save? (y/n — or tell me what to change)
 ```

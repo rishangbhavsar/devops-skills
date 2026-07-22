@@ -17,18 +17,21 @@ team automatically and readable by any other agent (see [Other agents](#other-ag
 Three flows, all governed by `recall/references/PROTOCOL.md`:
 
 - **RECALL** — on a reported problem, OR when starting non-trivial work (a plan, spec,
-  design, rollout, prioritization), the agent checks `.agent-recall/REGISTRY.md` →
-  the matching domain's `INDEX.md` → the learning file(s). When several learnings match
-  one situation (one symptom with multiple root causes; one task with several
-  context-dependent practices), it runs their **Signals** to determine which applies
-  now, then announces provenance before applying: *"Found prior learning `k8s/L-0001`
-  (incident, confidence HIGH, 3 ok/1 fail): increase
-  --max-mutating-requests-inflight. Applying."* Decisions are announced as
+  design, rollout, prioritization), the agent **asks first** (one-line y/n) before reading
+  `.agent-recall/REGISTRY.md` → the matching domain's `INDEX.md` → the learning file(s);
+  an explicit `/recall` skips the ask. When several learnings match one situation (one
+  symptom with multiple root causes; one task with several context-dependent practices),
+  it runs their **Signals** to determine which applies now, then announces provenance
+  before applying: *"Found prior learning `k8s/L-0001` (incident, confidence HIGH, 3 ok/1
+  fail): increase --max-mutating-requests-inflight. Applying."* Decisions are announced as
   *"Per prior decision `product/L-0003`: ... Following it unless you want to revisit."*
-- **RECORD OUTCOME** — after every application the learning's stats are updated
-  (success or failure — your word is final). Failed fixes get a dated note in the
-  learning's Pitfalls section, and repeated failure drives confidence down and
-  eventually triggers a supersede suggestion.
+  When the agent can't execute the fix itself (no cluster/cloud creds), it hands you the
+  exact commands plus the verification check and treats your report as the outcome.
+- **RECORD OUTCOME** — after every application — or whenever you report later that an
+  earlier suggestion worked or failed, even in a new session — the learning's stats are
+  updated (success or failure; your word is final). Failed fixes get a dated note in the
+  learning's Pitfalls section, and repeated failure drives confidence down and eventually
+  triggers a supersede suggestion.
 - **SAVE** — after a hard-won fix, a proven approach, or a considered decision (or when
   you type `/recall`), the agent picks the type, dedup-checks the store, classifies the
   write (CREATE / APPEND / VERSION / SUPERSEDE — where an alternative valid
@@ -87,6 +90,9 @@ can import it via `@AGENTS.md`.)
   "sev2", "pager", "PRD", "sprint plan"). The start-of-work recall trigger (plans,
   specs, designs) is the most likely to under-fire — reinforce it via the CLAUDE.md
   one-liner if needed.
+- **Recall asks before reading the store by default** (PROTOCOL.md §5 step 0). Want it
+  fully silent (recall without asking) or fully manual (only `/recall` ever recalls)?
+  Change §5 step 0 accordingly.
 - **Stricter control?** PROTOCOL.md §6 lets outcome bookkeeping (stat updates) happen
   without approval. If you want approval on those too, change §6 rule 4.
 - **Different decay thresholds?** Staleness (12 months) and failure thresholds live in

@@ -5,12 +5,20 @@
       "id": 1,
       "eval_name": "full-lifecycle-save-then-recall",
       "prompt": "hey, kubectl apply is just hanging when I try to deploy the payments service, no output for like 3 minutes. can you figure out whats going on",
-      "expected_output": "Agent checks .agent-recall/ (empty/missing -> no recall), debugs, resolves, OFFERS to save, presents approval summary in the PROTOCOL format, writes only after 'y', creates store + registry + domain + learning file + INDEX in correct formats, separate learn() commit. Then in a follow-up same-incident prompt: recalls, announces provenance with ID/confidence/stats BEFORE applying, runs verification, updates stats.",
+      "expected_output": "Agent ASKS whether to check the recall store first (ask-first, not silent); on confirmation checks .agent-recall/ (empty/missing -> no recall), debugs, resolves, OFFERS to save, presents approval summary in the PROTOCOL format including the literal INDEX line + frontmatter, writes only after 'y', creates store + registry + domain + learning file + INDEX in correct formats, separate learn() commit. Then in a follow-up same-incident prompt: recalls, announces provenance with ID/confidence/stats BEFORE applying; if it lacks execute access it hands the user the commands + verification and records the user's reported outcome, else runs verification itself; updates stats.",
       "files": [],
       "assertions": [
         {
+          "text": "Asks before reading the store (ask-first); does not recall silently",
+          "critical": false
+        },
+        {
           "text": "Does not write any learning file before explicit user approval",
           "critical": true
+        },
+        {
+          "text": "Approval summary shows the literal INDEX.md line and frontmatter block before writing",
+          "critical": false
         },
         {
           "text": "Approval summary includes bucket, domain, problem, fix summary, verification, file list",
@@ -46,7 +54,7 @@
       "id": 2,
       "eval_name": "recall-failure-then-alternate-cause-create",
       "prompt": "kubectl apply is hanging again on the staging cluster. same as before I think.",
-      "expected_output": "Given a store containing k8s/L-0001 (apply-hangs, apiserver-limits cause, with real past successes): agent recalls and announces it, applies, user says it didn't work. Agent records failure (stats + dated Pitfalls entry), debugs fresh, discovers a DIFFERENT valid root cause (node disk full). Because L-0001's fix genuinely solved past incidents, this is CREATE (alternate cause), NOT SUPERSEDE: both learnings stay active, titles disambiguated by cause, cross-linked via see_also, each Signals ends with a pointer to the other. New learning includes an Signals section with the highest-signal diagnostic leads from this incident (not every trial).",
+      "expected_output": "Given a store containing k8s/L-0001 (apply-hangs, apiserver-limits cause, with real past successes): agent asks to check the store, recalls and announces it, recommends/applies the fix, user says it didn't work. Agent records failure (stats + dated Pitfalls entry), debugs fresh, discovers a DIFFERENT valid root cause (node disk full). Because L-0001's fix genuinely solved past incidents, this is CREATE (alternate cause), NOT SUPERSEDE: both learnings stay active, titles disambiguated by cause, cross-linked via see_also, each Signals ends with a pointer to the other. New learning includes an Signals section with the highest-signal diagnostic leads from this incident (not every trial).",
       "files": [
         "prebuilt .agent-learnings store with k8s/L-0001"
       ],
@@ -98,7 +106,7 @@
       "id": 4,
       "eval_name": "pm-start-of-work-recall-and-decision",
       "prompt": "help me draft the roadmap for next quarter. I'm thinking we add a usage-based pricing tier to capture the heavy accounts",
-      "expected_output": "Given a store containing product/L-0002 (practice: pre-mortem before roadmap commit) and product/L-0003 (decision: flat pricing over usage-based, with Revisit-when conditions): agent recalls BOTH on this start-of-work trigger (no error involved). It surfaces the decision with provenance ('Per prior decision product/L-0003: flat per-seat pricing... Following it unless you want to revisit') and checks whether the user's suggestion matches a Revisit-when condition (heavy accounts >20% revenue) rather than silently overriding or silently obeying the old decision. It applies the pre-mortem practice while drafting. Outcomes recorded for both. If the user decides to reverse the pricing decision, agent classifies the save as SUPERSEDE (reversed decision), preserving old rationale.",
+      "expected_output": "Given a store containing product/L-0002 (practice: pre-mortem before roadmap commit) and product/L-0003 (decision: flat pricing over usage-based, with Revisit-when conditions): agent asks to check the store, then recalls BOTH on this start-of-work trigger (no error involved). It surfaces the decision with provenance ('Per prior decision product/L-0003: flat per-seat pricing... Following it unless you want to revisit') and checks whether the user's suggestion matches a Revisit-when condition (heavy accounts >20% revenue) rather than silently overriding or silently obeying the old decision. It applies the pre-mortem practice while drafting. Outcomes recorded for both. If the user decides to reverse the pricing decision, agent classifies the save as SUPERSEDE (reversed decision), preserving old rationale.",
       "files": [
         "prebuilt store with product/L-0002 (practice) and product/L-0003 (decision)"
       ],
