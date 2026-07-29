@@ -35,9 +35,10 @@ Grep the tracked source for the language's idioms:
 - **Shell/Docker**: `${NAME}` in scripts, `ENV`/`ARG` in `Dockerfile`, `environment:` in compose
 - **Config**: keys in `.env.example`/`.sample`/`.template`, k8s/Helm `env:` blocks
 
-Extract just the name (portable `grep`, since target repos may lack `rg`), e.g.:
+Extract just the name (portable `grep`, since target repos may lack `rg`). Grep **tracked files
+only** via `git ls-files` so you don't recurse into `node_modules/`, `vendor/`, or build output:
 ```bash
-grep -rhoE "process\.env\.[A-Z0-9_]+" . | sed 's/.*\.//' | sort -u
+git ls-files -z | xargs -0 grep -hoE "process\.env\.[A-Z0-9_]+" | sed 's/.*\.//' | sort -u
 ```
 Adapt the pattern per language. **Dynamic names** (`os.getenv(f"{prefix}_URL")`, `process.env[key]`)
 can't be grepped — note the pattern in a row rather than dropping it.

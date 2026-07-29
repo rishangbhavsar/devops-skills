@@ -3,12 +3,9 @@ id: L-0001
 domain: k8s
 type: incident
 status: active
-created: 2026-07-13
-updated: 2026-07-13
 context: "k8s 1.29, Ubuntu 22.04, payments team"
-stats: { applied: 4, succeeded: 3, failed: 1, last_used: 2026-07-10 }
+stats: { ok: 3, fail: 1 }
 superseded_by: null
-see_also: []
 ---
 
 # kubectl apply hangs indefinitely (apiserver limits)
@@ -16,7 +13,7 @@ see_also: []
 ## Signals
 - `kubectl apply -f ...` blocks with no output for >2 min
 1. `kubectl get --raw /metrics | grep apiserver_current_inflight` — at/near limit -> this cause
-2. apiserver logs show request queue saturation / 429s -> this cause
+2. apiserver logs show request queue saturation / 429s -> this cause (untested)
 3. `kubectl top nodes` + node `df -h` — disk full instead -> different cause, see alternatives
 
 ## Root cause

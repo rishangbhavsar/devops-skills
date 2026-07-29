@@ -15,11 +15,17 @@ running code.
 
 - `infra-blueprint-generator/SKILL.md` — single-file skill. Generates architecture documentation
   (`.knowledge/blueprint/`) for DevOps/IaC repos (Terraform, Ansible, Kubernetes, Helm, ArgoCD,
-  GitHub Actions). The whole skill — trigger description, config variables, and the multi-step
-  generated prompt — lives in this one file.
-- `recall-skill/` — multi-file skill (`recall/`) implementing a git-versioned, outcome-tracked
+  GitHub Actions). Stack/cloud are auto-detected, not configured. Resources are enumerated once, in
+  the per-domain docs — no separate flat inventory to drift out of sync.
+- `readme-blueprint-generator/SKILL.md` — single-file skill. Generates a repository `README.md`,
+  grounded in the actual source tree (with an optional fast path when `.github/copilot/` docs
+  exist). Same never-guess grounding discipline as the other skills.
+- `sync-envs/SKILL.md` — single-file skill. Scans a repo (or every microservice repo beneath CWD)
+  for env-var reads and generates a searchable `envs.md` knowledge base (Variable | Type | Default
+  | Description). Re-runs merge rather than clobber hand-curated descriptions.
+- `recall-event/` — multi-file skill (`recall/`) implementing a git-versioned, outcome-tracked
   learning store (`.agent-recall/` in a target repo) with three learning types: incident,
-  practice, decision.
+  practice, decision. (Directory is `recall-event/`; the skill's `name` is `recall`.)
   - `recall/SKILL.md` — trigger description + routing table; defers all actual rules to
     `references/PROTOCOL.md`.
   - `recall/references/PROTOCOL.md` — source of truth for every flow, format, and rule (recall,
@@ -46,7 +52,7 @@ running code.
   than duplicating rules inline (see `recall`'s SKILL.md → PROTOCOL.md split). This keeps the
   always-loaded SKILL.md small.
 - Never have a skill store secrets — only key names and where the value lives. This is enforced
-  explicitly in `recall`'s PROTOCOL.md §9 and tested by `evals/evals.json` eval #3; carry the same
+  explicitly in `recall`'s PROTOCOL.md §8 (Security) and tested by `evals/evals.json` eval #3; carry the same
   rule into any skill that touches config/secrets data.
 - `recall`'s file formats (frontmatter schema, INDEX.md line format, REGISTRY.md format) are parsed
   by other agents/tools — don't change field names or structure without updating every example in

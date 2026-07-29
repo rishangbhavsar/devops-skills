@@ -3,12 +3,9 @@ id: L-0002
 domain: product
 type: practice
 status: active
-created: 2026-07-13
-updated: 2026-07-13
 context: "B2B SaaS, quarterly planning cycle, team of 8"
-stats: { applied: 2, succeeded: 2, failed: 0, last_used: 2026-07-01 }
+stats: { ok: 2, fail: 0 }
 superseded_by: null
-see_also: []
 ---
 
 # pre-mortem before committing a quarterly roadmap
