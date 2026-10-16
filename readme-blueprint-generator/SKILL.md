@@ -27,59 +27,22 @@ Generate a comprehensive `README.md` for this repository, grounded in files that
    Dockerfile/compose/CI for how it builds and runs, and `.env.example` for env vars. Most repos
    have no `.github/copilot/` dir; in that case this step is the whole job, not a fallback.
 
-## Step 2 — Write the README with the following sections
+## Step 2 — Write the README
 
-Below, "Source from the *X* file" means the `.github/copilot/` doc when it exists, otherwise the
-corresponding real files from Step 1.
+Sections in this order. `←` names the `.github/copilot/` doc to source from when it exists;
+otherwise use the real files from Step 1.
 
-### Project Name and Description
-- Extract the project name and primary purpose (manifest `name`/`description`, or the docs)
-- Include a concise description of what the project does
+- **Project Name and Description** ← manifest `name`/`description` — what the project does, concisely
+- **Technology Stack** ← Technology_Stack — languages, frameworks, versions
+- **Project Architecture** ← Architecture — high-level overview; a simple diagram if documented
+- **Getting Started** ← manifests, Dockerfile/compose — prerequisites, install, setup, config
+- **Project Structure** ← Project_Folder_Structure — folder organization
+- **Key Features** ← entry points, routes/commands, public API surface
+- **Development Workflow** ← Workflow_Analysis — dev process, branching strategy if available
+- **Coding Standards** ← Coding_Standards
+- **Testing** ← Unit_Tests — approach and tools
+- **Contributing** ← Code_Exemplars, copilot-instructions
+- **Environment variables** ← Environment_Variables, `.env.example`, code — one row per var, with
+  default if available
 
-### Technology Stack
-- List the primary technologies, languages, and frameworks used
-- Include version information when available
-- Source this information primarily from the Technology_Stack file
-
-### Project Architecture
-- Provide a high-level overview of the architecture
-- Consider including a simple diagram if described in the documentation
-- Source from the Architecture file
-
-### Getting Started
-- Include installation instructions based on the technology stack
-- Add setup and configuration steps
-- Include any prerequisites
-
-### Project Structure
-- Brief overview of the folder organization
-- Source from Project_Folder_Structure file
-
-### Key Features
-- List main functionality and features of the project
-- Extract from the docs, or from entry points, routes/commands, and public API surface
-
-### Development Workflow
-- Summarize the development process
-- Include information about branching strategy if available
-- Source from Workflow_Analysis file
-
-### Coding Standards
-- Summarize key coding standards and conventions
-- Source from the Coding_Standards file
-
-### Testing
-- Explain testing approach and tools
-- Source from Unit_Tests file
-
-### Contributing
-- Guidelines for contributing to the project
-- Reference any code exemplars for guidance
-- Source from Code_Exemplars and copilot-instructions
-
-### Environment variables
-- List all the environment variables the project reads, one row each
-- Include default values if available; never print a secret's real value
-- Source from the Environment_Variables file or `.env.example` / code
-
-Keep the README concise yet informative, focusing on what new developers or users would need to know about the project.
+Keep it concise: what a new developer or user needs to know.

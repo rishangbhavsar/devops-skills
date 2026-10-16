@@ -14,40 +14,17 @@ team automatically and readable by any other agent (see [Other agents](#other-ag
 
 ## What it does
 
-Three flows, all governed by `recall/references/PROTOCOL.md`:
+Three flows; `recall/references/PROTOCOL.md` is the full spec.
 
-- **RECALL** — on a problem the user reports *or the agent hits itself*, OR when starting
-  non-trivial work (a plan, spec, design, rollout, prioritization), the agent reads
-  `.agent-recall/REGISTRY.md` unprompted — it's a few lines — and then **asks with the
-  finding in hand** before opening anything: *"3 `k8s` learnings may cover this — read them?
-  (y/n)"*. No matching domain, no question asked. An explicit `/recall` skips the ask
-  entirely. When several learnings match one situation (one symptom with multiple root
-  causes; one task with several context-dependent practices), it runs their **Signals** to
-  determine which applies now — never the confidence number, which says how well the fix
-  worked *there*, not that this is the same situation — then announces provenance before
-  applying: *"Found prior learning `k8s/L-0001` (incident, confidence MED, 3 ok/1
-  fail): increase --max-mutating-requests-inflight. Applying."* Decisions are announced as
-  *"Per prior decision `product/L-0003`: ... Following it unless you want to revisit."*
-  When the agent can't execute the fix itself (no cluster/cloud creds), it hands you the
-  exact commands plus the verification check and treats your report as the outcome.
-- **RECORD OUTCOME** — when an application produces an explicit outcome — including one you
-  report later, in a new session ("that fix you suggested worked") — the learning's stats are
-  updated (success or failure; your word is final). **Silence counts as nothing**: no answer,
-  no increment, because an inflated counter corrupts the one number here that isn't an
-  opinion. Failed fixes get a dated note in the learning's Pitfalls section, and repeated
-  failure drives confidence down — a learning that keeps failing reads as `LOW` and is a
-  candidate to supersede. A learning that has worked exactly once is also `LOW`; `MED` means
-  it reproduced on a separate later occasion, `HIGH` means three successes and no failures.
-  Decisions carry no confidence at all — consulting one isn't evidence it was right, so only
-  their `fail` counter moves.
-- **SAVE** — after a hard-won fix, a proven approach, or a considered decision (or when
-  you type `/recall`), the agent picks the type, dedup-checks by **content** (greps the
-  domain for the error string / command / metric name, since 12-word titles miss the same
-  event phrased differently), classifies the
-  write (CREATE / APPEND / SUPERSEDE — where an alternative valid
-  cause/approach is a cross-linked CREATE, and SUPERSEDE is reserved for learnings that
-  were wrong or obsolete), shows you a summary, and writes only after you say yes — as
-  its own `learn(<domain>): ...` commit.
+- **RECALL** (§5) — on an error, or at the start of a plan/spec/design, the agent reads
+  `.agent-recall/REGISTRY.md`, asks *"3 `k8s` learnings may cover this — read them? (y/n)"* on a
+  domain hit, picks among candidates by running their **Signals**, and announces provenance
+  (ID, confidence, stats) before applying.
+- **RECORD OUTCOME** (§6) — stats move only on an explicit worked/failed report, even a late one
+  next session; silence counts as nothing. Confidence is derived from those counts.
+- **SAVE** (§7) — after a hard-won fix, proven approach, or decision, the agent dedup-checks by
+  content, classifies CREATE / APPEND / SUPERSEDE, shows the exact bytes, and writes only on "yes"
+  as its own `learn(<domain>): ...` commit.
 
 ## Install (Claude Code)
 
@@ -111,16 +88,8 @@ can import it via `@AGENTS.md`.)
 
 ## Why not built-in memory?
 
-Claude Code auto memory is machine-local free-form notes; Hermes skills self-improve via
-LLM review. Neither tracks *which learning was applied to which situation and whether it
-helped*. This skill's differentiators: typed learning schemas (incident / practice /
-decision) instead of free-form notes, provenance announced on every recall, confidence
-earned from recorded outcomes, multi-cause diagnosis via Signals before applying any
-fix, an explicit wrong-learning → supersede loop, human-approved writes, and git-native
-team sharing across different agents.
-
-It also refuses to write what it didn't observe: a diagnostic check the agent believes
-*should* discriminate but never ran is marked `(untested)` or dropped, a root cause it
-can't establish is recorded as "Not established — fix worked, mechanism unconfirmed", and
-the context fingerprint holds observed versions only. A store of plausible-sounding
-guesses is worse than no store, because the next agent trusts it.
+Claude Code auto memory is machine-local free-form notes; Hermes skills self-improve via LLM
+review. Neither tracks *which learning was applied where and whether it helped*. This store adds
+typed schemas, announced provenance, outcome-earned confidence, Signals-based diagnosis, a
+supersede loop, human-approved writes, and git-native sharing across agents — and it refuses to
+record checks it never ran, because a store of plausible guesses is worse than none.

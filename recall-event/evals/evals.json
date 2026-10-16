@@ -82,10 +82,6 @@
         {
           "text": "New learning has Signals: ordered high-signal leads only, dead ends excluded, last entry points to alternative learning",
           "critical": true
-        },
-        {
-          "text": "SUPERSEDE still chosen correctly in the variant where the old diagnosis was wrong (stats show its fix never worked)",
-          "critical": false
         }
       ]
     },

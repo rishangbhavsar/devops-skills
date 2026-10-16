@@ -14,9 +14,9 @@ running code.
 ## Layout
 
 - `infra-blueprint-generator/SKILL.md` — single-file skill. Generates architecture documentation
-  (`.knowledge/blueprint/`) for DevOps/IaC repos (Terraform, Ansible, Kubernetes, Helm, ArgoCD,
-  GitHub Actions). Stack/cloud are auto-detected, not configured. Resources are enumerated once, in
-  the per-domain docs — no separate flat inventory to drift out of sync.
+  (single `.knowledge/blueprint/infra_blueprint.md`) for DevOps/IaC repos (Terraform, Ansible,
+  Kubernetes, Helm, ArgoCD, GitHub Actions). Stack/cloud are auto-detected, not configured. Points
+  at files/globs instead of enumerating resources; only Applications and Configuration get tables.
 - `readme-blueprint-generator/SKILL.md` — single-file skill. Generates a repository `README.md`,
   grounded in the actual source tree (with an optional fast path when `.github/copilot/` docs
   exist). Same never-guess grounding discipline as the other skills.

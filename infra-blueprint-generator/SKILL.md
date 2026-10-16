@@ -110,17 +110,7 @@ put it in Key Files as a pointer instead.
 
 ## Output
 
-Single file: `infra_blueprint.md`, with a table of contents at the top linking to each section
-below, in this order:
-
-1. Overview (10,000-ft view + generation date)
-2. Environments
-3. Diagrams
-4. System Design Rationale
-5. Key Files
-6. Applications (table)
-7. Configuration management (table)
-8. Conventions & Notable Decisions
-
+Single file `infra_blueprint.md`: a linked table of contents, then the sections in step order
+(Overview, Environments, Diagrams, Rationale, Key Files, Applications, Configuration, Conventions).
 Plain language for a developer new to *this* infra; stable headings and exact file paths so agents
 can navigate.

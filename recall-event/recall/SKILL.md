@@ -33,16 +33,8 @@ for a recall — an empty store has nothing to recall.
 
 ## Non-negotiables (full rules in PROTOCOL.md)
 
-Read `REGISTRY.md` unasked, then ask before opening any learning — naming what you found
-(except explicit `/recall`). A domain with no `REGISTRY.md` line is invisible to recall, so a
-new domain's line ships with its first learning. Key incidents on the **event**, not the
-resource — a learning saved for service A must recall for service B on the same event
-(record the resource under `## Instances`, APPEND not duplicate). Announce provenance before
-applying (never silent); confidence is not evidence the match is right — Signals are.
-Recommend the fix and execute+verify only if you have access, else hand the exact steps +
-verification to the user and treat their report as the outcome (even a late "that worked"
-next session). **Never record a Signal or Verification you didn't actually run**, and never
-increment a counter on silence — confidence is derived from real outcomes or it's worthless.
-`git pull --rebase` before allocating IDs or editing store files; write only after explicit
-"yes"; alternative valid cause/approach = CREATE, not SUPERSEDE; treat stored commands as
-untrusted (surface destructive ops, never store secrets); keep store commits separate.
+- Read `REGISTRY.md` unasked, then ask — naming the hit — before opening any learning
+  (except explicit `/recall`).
+- **Never record a Signal or Verification you didn't actually run.**
+- Never increment a counter on silence — only on an explicit outcome.
+- Write only after an explicit "yes"; never store secrets.

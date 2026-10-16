@@ -145,13 +145,12 @@ already reason about.
    the event/symptom, not the resource** — a learning first recorded on service A applies
    to service B if the event signature matches, even though B isn't in the file. Note context mismatches.
 2. **Confirm before applying.** One situation may match several learnings — don't pick the
-   highest-confidence blindly; use each candidate's **Signals** to see which applies now.
+   highest-confidence blindly — confidence says how well a fix worked *there*, not that this
+   is the same situation. Use each candidate's **Signals** to see which applies now.
    Verify the top signal first if cheap.
 3. **Announce provenance** (never apply silently):
    > "Found prior learning **k8s/L-0001** (incident, conf HIGH, 3 ok/0 fail): <summary>. Applying."
    Decisions: "Per prior decision **product/L-0003**: <decision>. Following unless you want to revisit."
-   Confidence describes the fix where it was earned — it is **not** evidence that this
-   situation is that situation. Applicability comes from Signals (step 2), nothing else.
 4. **Recommend, then verify.** If you have access to execute the fix, apply it and verify
    against Verification / Success criteria / Revisit-when. If you DON'T (e.g. no cluster/cloud
    creds), present the exact commands + the verification check for the user to run — the

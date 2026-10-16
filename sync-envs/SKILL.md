@@ -1,7 +1,6 @@
 ---
 name: sync-envs
 description: Scan a project's (or every microservice repo's) source code for the environment variables it reads and generate an envs.md knowledge base — a Markdown table of Variable | Type | Default | Description so a team can search in plain English which var controls what. Use this whenever the user asks to "sync envs", "generate/update envs.md", "document/catalog environment variables", "list env vars used in the project", "what env vars does this service need", or wants an env-var reference across one or more microservices — even if they don't say "envs.md" by name.
-usage: /sync-envs
 ---
 
 # Generate envs.md
@@ -19,14 +18,9 @@ Run `git rev-parse --show-toplevel`.
 - **Not a git repo** → find every repo beneath CWD with `fd -H -t d '^\.git$' . -x dirname {}`; for
   each, `cd` in, `git pull --ff-only` (skip + note on failure), process independently.
 
-## 2. Detect the stack
+## 2. Find every env-var read
 
-`git ls-files`, then infer language(s) from extensions / manifests (`package.json`, `pyproject.toml`,
-`go.mod`, `pom.xml`, `Cargo.toml`, `*.csproj`, `Gemfile`). This picks which access idioms to grep for.
-
-## 3. Find every env-var read
-
-Grep the tracked source for the language's idioms:
+Grep the tracked source for these idioms (languages the repo doesn't use just return nothing):
 - **Node/JS/TS**: `process.env.NAME`, `process.env['NAME']`, `import.meta.env.NAME`
 - **Python**: `os.environ[...]`, `os.getenv(...)`, Pydantic `BaseSettings` fields
 - **Go**: `os.Getenv(...)`, `os.LookupEnv(...)`
@@ -58,7 +52,7 @@ pattern itself so a reader knows any such token is a required env var.
 
 Then **read each var's call sites** so the Description reflects real purpose, not a name-guess.
 
-## 4. Fill each row (from the code, never guessing)
+## 3. Fill each row (from the code, never guessing)
 
 - **Type** — `string` | `integer` | `boolean` | `enum` | `url` | `path`. Infer from usage: `integer`
   if parsed (`int()`/`parseInt`/`Atoi`), `boolean` if compared truthy, `enum` if checked against a
