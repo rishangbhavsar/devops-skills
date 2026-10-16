@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<meta name="plan-template" content="lite">
+<title>{{PLAN_TITLE}} — Plan</title>
+<link rel="stylesheet" href="_assets/plan.css">
+<script src="_assets/plan.js"></script>
+</head>
+<body>
+<svg class="svg-defs" aria-hidden="true" focusable="false"><defs><marker id="arrowhead" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path class="arrowhead" d="M0,0 L8,4 L0,8 z"/></marker></defs></svg>
+<!-- Lite plan: about three files or fewer, no real design choice. One screen. Switch to plan-template.html if it grows. -->
+<div class="page">
+<main id="main">
+<header id="top">
+  <a class="back" href="index.html">← All plans</a>
+  <h1>{{PLAN_TITLE}}</h1>
+  <p class="lede">{{SCOPE_IN_ONE_SENTENCE}}</p>
+  <div class="meta">
+    <!-- data-status and badge colour: draft info, awaiting warn, approved ok, implemented ok, implemented-deviations warn, superseded info -->
+    <span class="badge status warn" data-status="awaiting">Awaiting approval</span>
+    <span data-version="{{VERSION}}">Version {{VERSION}}</span>
+    <time datetime="{{DATE_ISO}}">{{DATE}}</time>
+    <span>Planned by Claude Code for {{REQUESTER}}</span>
+  </div>
+</header>
+<!-- Version 2 and later only, plus a Changelog section (references/visual-guide.md):
+<div class="callout changed"><strong>What changed since version [N]:</strong> [the changes, by section]</div>
+-->
+
+<!-- Only for a real judgment call: copy the decisions section from plan-template.html. -->
+
+<section id="tldr">
+  <h2>Summary</h2>
+  <div class="tldr">{{SUMMARY_2_TO_3_SENTENCES}}</div>
+</section>
+
+<section id="behaviour">
+  <h2>Behaviour</h2>
+  <div class="table-wrap" role="region" aria-labelledby="cap-beh" tabindex="0">
+  <table>
+    <caption id="cap-beh">What happens now, what should happen, and what must not change</caption>
+    <thead><tr><th scope="col">Current</th><th scope="col">Expected</th><th scope="col">Must stay unchanged</th></tr></thead>
+    <tbody><tr><td>{{CURRENT_BEHAVIOUR}}</td><td>{{EXPECTED_BEHAVIOUR}}</td><td>{{UNCHANGED_BEHAVIOUR}}</td></tr></tbody>
+  </table>
+  </div>
+</section>
+
+<section id="fix">
+  <h2>The fix</h2>
+  <p>{{ROOT_CAUSE_AND_FIX}} In <a class="path" href="{{FILE_LINK}}"><code>{{FILE_PATH}}</code></a>:</p>
+<pre><code class="nohighlight"><span class="del">{{REMOVED_LINE}}</span>
+<span class="add">{{ADDED_LINE}}</span></code></pre>
+</section>
+
+<section id="testing">
+  <h2>Testing</h2>
+  <div class="table-wrap" role="region" aria-labelledby="cap-tests" tabindex="0">
+  <table>
+    <caption id="cap-tests">How the fix is proven, including the unchanged behaviour</caption>
+    <thead><tr><th scope="col">ID</th><th scope="col">Check</th><th scope="col">How</th></tr></thead>
+    <tbody>
+      <tr><td>T1</td><td>{{EXPECTED_BEHAVIOUR_TEST}}</td><td>{{TEST_HOW}}</td></tr>
+      <tr><td>T2</td><td>{{UNCHANGED_BEHAVIOUR_TEST}}</td><td>{{TEST_HOW}}</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<section id="risks">
+  <h2>Risks</h2>
+  <div class="table-wrap" role="region" aria-labelledby="cap-risks" tabindex="0">
+  <table>
+    <caption id="cap-risks">Small change, but not risk-free</caption>
+    <thead><tr><th scope="col">Risk</th><th scope="col">Likelihood</th><th scope="col">Impact</th><th scope="col">Mitigation</th></tr></thead>
+    <tbody><tr><td>{{RISK}}</td><td><span class="badge ok">Low</span></td><td><span class="badge warn">Medium</span></td><td>{{MITIGATION}}</td></tr></tbody>
+  </table>
+  </div>
+</section>
+</main>
+</div>
+
+</body>
+</html>

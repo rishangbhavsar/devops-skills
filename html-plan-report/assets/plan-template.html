@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<meta name="plan-template" content="full">
+<title>{{PLAN_TITLE}} — Implementation Plan</title>
+<link rel="stylesheet" href="_assets/plan.css">
+<script src="_assets/plan.js"></script>
+</head>
+<body>
+<!-- Shared arrowhead: diagrams use class="arrow" and never define a marker. -->
+<svg class="svg-defs" aria-hidden="true" focusable="false"><defs><marker id="arrowhead" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path class="arrowhead" d="M0,0 L8,4 L0,8 z"/></marker></defs></svg>
+<a class="skip" href="#main">Skip to the plan</a>
+<div class="layout">
+
+<nav class="toc" id="toc" aria-label="On this page" hidden>
+  <button class="toc-toggle" type="button" aria-controls="toc" aria-expanded="true" aria-label="Hide contents" title="Hide contents" hidden><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M10 3 5 8l5 5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+  <details open><summary>On this page</summary><ul id="toc-list"></ul></details>
+</nav>
+<div class="toc-resizer" role="separator" aria-orientation="vertical" aria-controls="toc" aria-label="Resize contents panel"
+     aria-valuemin="140" aria-valuemax="360" aria-valuenow="190" tabindex="0" title="Drag to resize, double-click to reset" hidden></div>
+
+<main id="main">
+<header id="top">
+  <a class="back" href="index.html">← All plans</a>
+  <h1>{{PLAN_TITLE}}</h1>
+  <p class="lede">{{SCOPE_IN_ONE_SENTENCE}}</p>
+  <div class="meta">
+    <!-- data-status and badge colour: draft info, awaiting warn, approved ok, implemented ok, implemented-deviations warn, superseded info -->
+    <span class="badge status warn" data-status="awaiting">Awaiting approval</span>
+    <span data-version="{{VERSION}}">Version {{VERSION}}</span>
+    <time datetime="{{DATE_ISO}}">{{DATE}}</time>
+    <span>Planned by Claude Code for {{REQUESTER}}</span>
+  </div>
+  <div class="stats" aria-label="Plan at a glance">
+    <div class="stat"><span>Overall size</span><strong>{{SIZE}}</strong> &nbsp;{{STEP_COUNT}} steps</div>
+    <div class="stat"><span>Files</span><strong>{{FILE_COUNT}}</strong> &nbsp;{{NEW_COUNT}} new, {{EDIT_COUNT}} edited</div>
+    <div class="stat"><span>Risk</span><strong>{{RISK_LEVEL}}</strong> &nbsp;{{RISK_NOTE}}</div>
+    <div class="stat"><span>Breaking change</span><strong>{{BREAKING}}</strong> &nbsp;{{BREAKING_NOTE}}</div>
+  </div>
+</header>
+<!-- Version 2 and later only, plus a Changelog section (references/visual-guide.md):
+<div class="callout changed"><strong>What changed since version [N]:</strong> [the changes, by section]</div>
+-->
+
+<section id="decide" class="decisions" aria-labelledby="decide-h">
+  <h2 id="decide-h">Decisions for you</h2>
+  <p class="answer-hint">Compare the options here. Claude Code asks the same questions in your terminal, with my pick first; answer there. If the terminal prompt is not available, pick below, copy the reply and paste it into Claude Code.</p>
+  <!-- Rules: SKILL.md "Decisions". None? Replace the blocks and the reply with <p class="no-decisions">No decisions needed: …</p> -->
+  <div class="decision" data-id="D1" data-header="{{D1_HEADER}}">
+    <h3>D1: {{D1_QUESTION}}</h3>
+    <fieldset>
+      <legend>D1</legend>
+      <label class="opt" data-label="{{D1_PICK_LABEL}}"><input type="radio" name="d1" checked data-recommended="1">
+        <span><strong>{{D1_PICK_LABEL}} (my pick).</strong> {{D1_PICK_WHY}}</span>
+        <small>{{D1_PICK_TRADEOFF}}</small></label>
+      <label class="opt" data-label="{{D1_ALT_LABEL}}"><input type="radio" name="d1">
+        <span><strong>{{D1_ALT_LABEL}}.</strong> {{D1_ALT_WHAT}}</span>
+        <small>Pick this if: {{D1_ALT_PICK_IF}}</small></label>
+    </fieldset>
+  </div>
+  <!-- Once answered: add data-decided="<label>" to the .decision and replace its fieldset with:
+  <div class="decided"><span class="badge ok">Decided</span><strong>[chosen label].</strong> [what it means]</div>
+  <p class="not-taken">Not taken: [the other options].</p>
+  -->
+  <div class="reply">
+    <pre id="reply-text">Approved with the recommended options. Go ahead.</pre>
+    <button class="copy" type="button" data-copy="reply-text" hidden>Copy</button>
+  </div>
+</section>
+
+<section id="tldr">
+  <h2>Recommendation</h2>
+  <div class="tldr">{{RECOMMENDATION_2_TO_4_SENTENCES}}</div>
+</section>
+
+<section id="goals">
+  <h2>Goal and non-goals</h2>
+  <p>{{GOAL_AND_SUCCESS_CRITERIA}}</p>
+  <ul><li>Not in scope: {{NON_GOAL}}</li></ul>
+</section>
+
+<section id="current">
+  <h2>Current state</h2>
+  <p>{{HOW_IT_WORKS_TODAY}} See <a class="path" href="{{FILE_LINK}}"><code>{{FILE_PATH}}</code></a>.</p>
+  <!-- One item per finding that shapes the plan. class="problem" for something broken or unsafe. Mark claims you did not run or read as inferred. -->
+  <ol class="findings">
+    <li><div><b>{{FINDING_TITLE}}</b> {{FINDING_DETAIL}} <span class="badge ok">verified</span></div></li>
+    <li class="problem"><div><b>{{PROBLEM_TITLE}}</b> {{PROBLEM_DETAIL}} <span class="badge warn">inferred</span></div></li>
+  </ol>
+</section>
+
+<section id="approach">
+  <h2>Proposed approach</h2>
+  <p>{{APPROACH_SUMMARY}}</p>
+  <!-- A linear path: flow chips. Anything else: an SVG recipe from references/visual-guide.md. -->
+  <div class="flow" role="img" aria-label="{{FLOW_DESCRIPTION}}"><span>{{STEP_A}}</span><i>→</i><span class="new">{{STEP_B_NEW}}</span><i>→</i><span>{{STEP_C}}</span></div>
+  <h3>Considered and rejected</h3>
+  <ul><li><b>{{REJECTED_OPTION}}:</b> {{WHY_NOT}}</li></ul>
+  <div class="callout weak"><strong>Weakest part of this plan:</strong> {{WEAKEST_PART}}</div>
+</section>
+
+<section id="steps">
+  <h2>Implementation steps</h2>
+  <ol class="steps">
+    <li data-step="S1"><span class="sid">S1</span> <strong>{{STEP_TITLE}}</strong> <span class="size">{{S_M_L}}</span><br>{{STEP_DETAIL}} Files: <code>{{FILE_PATH}}</code>. Verify: {{HOW_TO_VERIFY}}</li>
+    <li data-step="S2"><span class="sid">S2</span> <strong>{{STEP_TITLE}}</strong> <span class="size">{{S_M_L}}</span><br>{{STEP_DETAIL}} Files: <code>{{FILE_PATH}}</code>. Verify: {{HOW_TO_VERIFY}}</li>
+  </ol>
+  <details>
+    <summary>Mechanical work (no judgment calls)</summary>
+    <ul><li>{{MECHANICAL_TASK}}</li></ul>
+  </details>
+</section>
+
+<section id="files">
+  <h2>File change map</h2>
+  <div class="table-wrap" role="region" aria-labelledby="cap-files" tabindex="0">
+  <table>
+    <caption id="cap-files">{{FILES_CAPTION}}</caption>
+    <thead><tr><th scope="col">File</th><th scope="col">Change</th><th scope="col">Steps</th><th scope="col">Purpose</th></tr></thead>
+    <tbody>
+      <tr><td><a class="path" href="{{FILE_LINK}}"><code>{{FILE_PATH}}</code></a></td><td><span class="badge warn">edit</span></td><td>S1</td><td>{{WHY}}</td></tr>
+      <tr><td><a class="path" href="{{FILE_LINK}}"><code>{{FILE_PATH}}</code></a></td><td><span class="badge ok">new</span></td><td>S2</td><td>{{WHY}}</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<section id="changes">
+  <h2>Key changes</h2>
+  <!-- Content depends on size: SKILL.md "Key changes". Optional and large-change blocks: references/visual-guide.md. -->
+  <div class="table-wrap" role="region" aria-labelledby="cap-contracts" tabindex="0">
+  <table>
+    <caption id="cap-contracts">Contract changes: boundaries other code depends on, including implicit ones</caption>
+    <thead><tr><th scope="col">Contract</th><th scope="col">Before</th><th scope="col">After</th><th scope="col">Breaks?</th><th scope="col">Who depends on it</th><th scope="col">Step</th></tr></thead>
+    <tbody>
+      <tr><td>{{CONTRACT}}</td><td>{{BEFORE}}</td><td>{{AFTER}}</td><td><span class="badge ok">No</span></td><td>{{CONSUMERS}}</td><td>S1</td></tr>
+    </tbody>
+  </table>
+  </div>
+<pre><code class="language-{{CODE_LANGUAGE}}">{{INTERFACE_OR_CONFIG_EXAMPLE}}</code></pre>
+</section>
+
+<section id="testing">
+  <h2>Testing and verification</h2>
+  <div class="table-wrap" role="region" aria-labelledby="cap-tests" tabindex="0">
+  <table>
+    <caption id="cap-tests">Each test names the steps it proves</caption>
+    <thead><tr><th scope="col">ID</th><th scope="col">Check</th><th scope="col">Proves</th><th scope="col">How</th></tr></thead>
+    <tbody>
+      <tr><td>T1</td><td>{{TEST_CHECK}}</td><td>S1</td><td>{{TEST_HOW}}</td></tr>
+      <tr><td>T2</td><td>{{TEST_CHECK}}</td><td>S2</td><td>{{TEST_HOW}}</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<section id="risks">
+  <h2>Risks and mitigations</h2>
+  <div class="table-wrap" role="region" aria-labelledby="cap-risks" tabindex="0">
+  <table>
+    <caption id="cap-risks">{{RISKS_CAPTION}}</caption>
+    <thead><tr><th scope="col">Risk</th><th scope="col">Steps</th><th scope="col">Likelihood</th><th scope="col">Impact</th><th scope="col">Mitigation</th></tr></thead>
+    <tbody>
+      <tr><td>{{RISK}}</td><td>S1</td><td><span class="badge warn">Medium</span></td><td><span class="badge risk">High</span></td><td>{{MITIGATION}}</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<section id="open">
+  <h2>Assumptions and open questions</h2>
+  <ul>
+    <li>Assumption: {{ASSUMPTION}}</li>
+    <li>{{OPEN_QUESTION}} <span class="lean">Lean: {{CURRENT_LEANING}}</span></li>
+  </ul>
+</section>
+
+<!-- Delete if the plan used nothing outside the repo. -->
+<section id="sources">
+  <h2>Sources</h2>
+  <ul><li><a href="{{SOURCE_URL}}">{{SOURCE_TITLE}}</a></li></ul>
+</section>
+</main>
+</div>
+
+</body>
+</html>

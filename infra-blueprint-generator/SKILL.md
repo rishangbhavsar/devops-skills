@@ -1,104 +1,116 @@
 ---
 name: infra-blueprint-generator
-description: Generate evidence-based documentation for Terraform, Ansible, Kubernetes, Helm, ArgoCD, CI/CD, and cloud infrastructure repositories. Use for onboarding, architecture discovery, and agent context.
+description: 'Blueprint generator for DevOps/infrastructure repositories. Analyzes IaC and config files (.tf, .tfvars, .hcl, .yaml/.yml, .json, .tpl, .j2, Taskfile) across Terraform, Ansible, Kubernetes, Helm, ArgoCD/GitOps, GitHub Actions, and AWS/Azure/GCP. Produces a single `infra_blueprint.md`: an architecture overview with multiple Mermaid diagrams, a System Design Rationale section (why this architecture, trade-offs), a Key Files navigation section (globs/patterns per area, not per-resource enumeration), structured tables only for Applications/microservices and Configuration management, and conventions/notable-decisions notes. Use to document how infra works, onboard engineers, or give coding agents context — without generating docs that drift from the code.'
 ---
 
 # Infrastructure Blueprint Generator
 
-Document the repository in `<git-root>/.knowledge/blueprint/`, where `<git-root>` is returned by `git rev-parse --show-toplevel`.
+Document a DevOps/infra repository for onboarding engineers and AI coding agents. Output is a
+single file, `<git repo root>/.knowledge/blueprint/infra_blueprint.md` (create the dir; find root
+with `git rev-parse --show-toplevel`). Stack and cloud are detected from the repo in Step 1 —
+nothing to configure up front.
 
-## Options
+Bias toward pointing at code, not restating it. Only two things get exhaustive structured tables
+(Applications, Configuration management) — everything else is diagrams plus file/glob pointers, so
+the doc stays cheap to keep in sync instead of drifting the moment a resource is added or renamed.
 
-```text
-${TECH_STACK="Auto-detect|Terraform|Ansible|Kubernetes|Helm|ArgoCD|GitHub Actions|Mixed"}
-${CLOUD_PROVIDER="Auto-detect|AWS|Azure|GCP|Multi-cloud|None"}
-${OUTPUT_STRUCTURE="Per-module files|Single document"}
-```
+## Grounding Rules (every section)
+- Every claim traces to a file path. Can't be determined from the repo → write
+  `Not determined from repo` — never guess, never a generic "usual setup".
+- Versions come from files only (`.terraform.lock.hcl`, `Chart.yaml`, image tags). Not pinned →
+  write `version not pinned`.
+- Prefix deductions with `Inferred:`.
+- Never record a secret value — only the key name and its source (e.g. External Secrets → AWS
+  Secrets Manager path).
 
-## Rules
+## Step 1 — Survey & Plan
 
-- Describe the implementation in the repository, not a typical setup.
-- Cite a file path for every claim. Write `Not determined from repo` when evidence is absent.
-- Mark deductions with `Inferred:`.
-- Report versions only when pinned in source files such as `.terraform.lock.hcl`, `Chart.yaml`, or image tags. Otherwise write `version not pinned`.
-- Never include secret values. Record only the key and its source.
-- Treat examples as format guidance; do not copy their names or flows.
-- Include the generation date.
+1. `git ls-files` (or `tree --gitignore`) to map the layout. Read `Taskfile.yml` first if present —
+   it encodes the intended workflow (plan/apply, deploy, sync).
+2. Probe for stack signals with `rg` instead of reading every file: `kind:`/`apiVersion:`
+   (Kubernetes), `Chart.yaml`/`values*.yaml` (Helm), `provider "`/`backend "`/`*.tfvars`/
+   `terragrunt.hcl` (Terraform/Terragrunt), `Application`/`targetRevision` (ArgoCD), `roles/` +
+   `playbook*.yml` (Ansible), `.github/workflows/` (CI). Cloud comes from provider blocks and
+   resource prefixes (`aws_*`, `azurerm_*`, `google_*`). Dependency edges come from
+   `terraform graph`, module `source`, and output references.
+3. Todo-list every unit to analyze — each Terraform root, Helm chart, ArgoCD app, workflow, service
+   — and work through it item by item.
 
-## Workflow
+## Step 2 — Architecture Overview
 
-1. Find the repository root and inspect tracked files with `git ls-files` or `tree --gitignore`.
-2. Read `Taskfile.yml` first when present.
-3. Detect relevant stacks and clouds from their source files. Honor `TECH_STACK` and `CLOUD_PROVIDER` when specified.
-4. Inventory every applicable Terraform root, Helm chart, ArgoCD application, Ansible playbook or role, workflow, and deployed service before writing.
-5. Trace dependencies through source references, inputs, outputs, rendered configuration, and delivery workflows. Use `terraform graph` when available and useful.
+- **10,000-ft view**: 3–5 sentences — what this repo provisions/deploys, on which cloud, with which
+  toolchain, how a change travels from commit to running infra. Note the generation date.
+- Environments (dev/stage/prod) and how they differ: workspaces, overlays, tfvars, values files.
+- **Diagrams (Mermaid).** Create every one that applies, not just one. Every node drawn must be
+  traceable to an entry in Step 4's Key Files section.
+  1. **Component dependency map** — all tools/layers and directed dependencies (always).
+  2. **Network topology** — VPC/subnets/LB → ingress → services (if networking exists).
+  3. **Delivery flow** — commit → CI → registry → GitOps → cluster (if CI/CD exists).
+  4. **Application map** — microservices and what each talks to: other services, DBs, queues (if
+     apps exist).
 
-Useful stack signals include:
+## Step 3 — System Design Rationale
 
-- Terraform/Terragrunt: `*.tf`, `*.tfvars`, `.terraform.lock.hcl`, `terragrunt.hcl`
-- Kubernetes: `apiVersion`, `kind`, manifests and overlays
-- Helm: `Chart.yaml`, templates, `values*.yaml`
-- ArgoCD: `Application`, `targetRevision`
-- Ansible: playbooks, `roles/`, `group_vars/`, `host_vars/`
-- CI/CD: `.github/workflows/` and other pipeline configuration
+Separate from the Overview (what exists) and Diagrams (how it connects) — this is *why* it's built
+this way. Only what's evidenced in code, comments, READMEs, ADRs, or PR descriptions; everything
+else is `Inferred:` from the shape of the code, never invented.
 
-## Required Documentation
+- **Why this architecture** — e.g. why multi-account over single-account, why this cluster
+  topology, why this state-backend choice.
+- **Trade-offs taken** — what was given up for what (e.g. simpler CI at the cost of slower
+  rollback; managed service over self-hosted for less ops burden).
+- **Alternatives evidently rejected** — only if evidenced (a comment, a removed module left in
+  git history via `git log -p`, an ADR) — never speculate on what *could* have been chosen.
 
-### Architecture overview
+If nothing is evidenced beyond the code's shape, keep this short and mark it plainly:
+`Rationale not documented — inferred from structure:` followed by the inference.
 
-Explain what the repository provisions or deploys, the target cloud or platform, its toolchain, environment differences, and the path from a committed change to running infrastructure.
+## Step 4 — Key Files (navigation, not enumeration)
 
-Add every applicable Mermaid diagram, omitting unsupported nodes:
+One flat section, organized by area, listing glob/path patterns an agent greps from — not
+individual resources, not versions, not per-item tables:
 
-- Component dependencies (always)
-- Network topology
-- Delivery flow
-- Application and service dependencies
+- **Cloud provisioning / IaC** — including state backend + locking
+- **Networking** — cloud and cluster as one path: VPC → LB → ingress → service
+- **Compute & data** — clusters, node groups, VMs, and the stateful services they use
+- **Identity & secrets** — IAM/RBAC, KMS, workload identity, secrets operators
+- **Delivery (CI → GitOps)** — workflows and ArgoCD apps as one flow; note sync policy inline
+- **Observability**
+- **Security & policy** — admission control, policy engines, image scanning
 
-### Inventories
+Format per area: `<Area>` — one or two lines naming the pattern/entry-point files (e.g. "IAM/RBAC
+lives in `modules/iam/*.tf` and `k8s/rbac/*.yaml`; workload identity wired in
+`modules/iam/irsa.tf`"). No resource-by-resource listing, no versions — that's what the agent reads
+the pointed-to files to get.
 
-Each entry must include its name, type, pinned version when available, and source path. Cover applicable items only:
+## Step 5 — Structured Exceptions
 
-- **Cloud:** network, compute, clusters, data services, storage, messaging, DNS, identity, encryption
-- **Cluster platform:** GitOps, observability, ingress, TLS, policy, RBAC, service mesh, secret operators
-- **Applications:** image/tag, namespace, ports, replicas/resources, dependencies, and producing manifest/chart/overlay
-- **Configuration:** environment variables, ConfigMaps, Terraform variables and tfvars, Helm values, templates, and Ansible variables; explain environment layering and precedence
+These two areas hold relational facts that span multiple files and aren't recoverable by grepping
+one place — they keep tables. No other area gets one; if a repo seems to need a table elsewhere,
+put it in Key Files as a pointer instead.
 
-Every diagram node must have a corresponding inventory or module entry.
+- **Applications / microservices** — table per service: image + tag, namespace, ports/endpoints,
+  replicas/resources, what it depends on (databases, queues, other services), and the
+  manifest/chart/overlay producing it.
+  - *Regenerate when a service is added/removed or its manifest/chart changes.*
+- **Configuration management** — env vars, ConfigMap data, Terraform `variable` defaults +
+  `*.tfvars`, values sections, Ansible `group_vars`/`host_vars`; per environment, with the layering
+  order and precedence (which source wins).
+  - *Regenerate when a config source is added or the layering/precedence order changes.*
 
-### Module documentation
+## Conventions & Notable Decisions
 
-Derive modules from repository domains. Do not create empty domains or duplicate resources across modules; cross-link shared concerns instead.
-
-Use this section order for each module:
-
-1. Module Name
-2. Purpose
-3. Components
-4. Dependencies
-5. Key Files
-6. Data/Config Flow
-7. Security Notes
-8. Common Gotchas
-9. Related Modules
-
-Trace data/config flow through actual files. Add a small Mermaid diagram when at least three parts interact. Include only evidenced gotchas; otherwise write `None observed`.
-
-Possible domains include IaC, state/backend, configuration management, CI, GitOps, applications, cloud networking, cluster networking/ingress, secrets, observability, security/policy, and identity/access.
-
-### Repository conventions
-
-Document:
-
-- Naming and directory conventions
-- Environment configuration layering and precedence
-- The repository-specific steps for adding modules, applications, overrides, jobs, and workloads
-- Decisions visible in code or documentation; prefix undocumented rationale with `Inferred:`
+- Naming conventions (resources, modules, releases, namespaces, workflows).
+- Repository layout — what belongs where.
+- Add-a-thing steps: add a Terraform module / ArgoCD app / Helm override / CI job / workload, in the
+  order the repo expects.
+- Security posture (secrets handling, network rules, IAM/RBAC — key names and source only, never
+  values) and any gotchas evidenced in code/comments/READMEs/CI. Prose, not enumerated; omit if
+  none observed. (Architecture-level rationale and trade-offs live in Step 3, not here.)
 
 ## Output
 
-- If `OUTPUT_STRUCTURE` is `Per-module files`, create `Infra_Blueprint.md` as the overview/index and one Markdown file per module.
-- If it is `Single document`, create `Infra_Blueprint.md` with a table of contents.
-- Always create `llms.md` with one linked row per module or major section, a one-line description, and useful search terms.
-- Use stable headings, plain language, relative links, and exact source paths.
-- End with a concise list of conventions future changes must follow.
+Single file `infra_blueprint.md`: a linked table of contents, then the sections in step order
+(Overview, Environments, Diagrams, Rationale, Key Files, Applications, Configuration, Conventions).
+Plain language for a developer new to *this* infra; stable headings and exact file paths so agents
+can navigate.

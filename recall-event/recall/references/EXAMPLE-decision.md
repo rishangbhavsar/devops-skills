@@ -3,12 +3,9 @@ id: L-0003
 domain: product
 type: decision
 status: active
-created: 2026-07-13
-updated: 2026-07-13
 context: "pricing v2 project, ~40 paying customers, mostly SMB"
-stats: { applied: 1, succeeded: 1, failed: 0, last_used: 2026-07-13 }
+stats: { ok: 0, fail: 0 }   # decisions only ever increment fail; no confidence
 superseded_by: null
-see_also: []
 ---
 
 # flat per-seat pricing over usage-based pricing

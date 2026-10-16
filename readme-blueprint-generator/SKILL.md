@@ -1,39 +1,48 @@
 ---
 name: readme-blueprint-generator
-description: Generate a repository README from `.github/copilot/`, `.github/copilot-instructions.md`, and project files. Use when creating or refreshing developer-facing setup, architecture, workflow, and contribution documentation.
+description: Generate or refresh a repository's README.md, grounded in the actual source tree. Use when the user asks to "generate/write/update the README", "create README.md", "document this repo's README", or wants a top-level project readme. Detects the technology stack, architecture, structure, workflow, and env vars from real files; if `.github/copilot/` docs or `copilot-instructions.md` exist it uses them as a fast path, otherwise it reads the code directly. Never invents facts not in the repo.
 ---
 
-# README Blueprint Generator
+# README Generator Prompt
 
-Create or update the repository-root `README.md` using evidence from the repository.
+Generate a comprehensive `README.md` for this repository, grounded in files that actually exist.
 
-## Sources
+## Grounding rules
+- Every statement traces to a real file (manifest, source, config, CI). Can't determine it from the
+  repo → omit the section or write `Not determined from repo` — never guess a stack, command, or
+  version.
+- Versions come from files only (`package.json`, `pyproject.toml`, `go.mod`, lockfiles). Not pinned
+  → say so.
+- Prefix any deduction with `Inferred:`.
+- Never emit a secret value — name the env var and where its value comes from.
 
-1. Read `.github/copilot-instructions.md` and all files under `.github/copilot/` when present, especially documentation for architecture, technology stack, folder structure, workflows, coding standards, tests, code exemplars, and environment variables.
-2. Verify commands, versions, paths, and configuration against project files. Do not invent missing details.
-3. Preserve accurate, useful content from an existing `README.md`.
+## Step 1 — Gather sources
 
-## README Content
+1. **Fast path (if present):** scan `.github/copilot/` (Architecture, Code_Exemplars,
+   Coding_Standards, Project_Folder_Structure, Technology_Stack, Unit_Tests, Workflow_Analysis,
+   Environment_Variables) and `.github/copilot-instructions.md`. These are curated summaries — use
+   them, but still confirm against the code before stating a fact.
+2. **Always (and the sole source when the fast path is absent):** read the real repo —
+   `git ls-files` for layout, the language manifest(s) for stack/versions/scripts, entry points,
+   Dockerfile/compose/CI for how it builds and runs, and `.env.example` for env vars. Most repos
+   have no `.github/copilot/` dir; in that case this step is the whole job, not a fallback.
 
-Include applicable sections only:
+## Step 2 — Write the README
 
-- **Project name and description:** purpose and primary functionality
-- **Technology stack:** languages, frameworks, tools, and versions when pinned
-- **Architecture:** high-level components and relationships; add a simple Mermaid diagram only when supported by the sources
-- **Getting started:** prerequisites, installation, configuration, and runnable commands
-- **Project structure:** important directories and their roles
-- **Key features:** implemented capabilities
-- **Development workflow:** local workflow, branching, builds, and releases
-- **Coding standards:** repository-specific conventions
-- **Testing:** test tools and exact commands
-- **Contributing:** contribution steps and links to relevant guidance or exemplars
-- **Environment variables:** name, purpose, required/optional status, and non-secret default when documented
+Sections in this order. `←` names the `.github/copilot/` doc to source from when it exists;
+otherwise use the real files from Step 1.
 
-## Rules
+- **Project Name and Description** ← manifest `name`/`description` — what the project does, concisely
+- **Technology Stack** ← Technology_Stack — languages, frameworks, versions
+- **Project Architecture** ← Architecture — high-level overview; a simple diagram if documented
+- **Getting Started** ← manifests, Dockerfile/compose — prerequisites, install, setup, config
+- **Project Structure** ← Project_Folder_Structure — folder organization
+- **Key Features** ← entry points, routes/commands, public API surface
+- **Development Workflow** ← Workflow_Analysis — dev process, branching strategy if available
+- **Coding Standards** ← Coding_Standards
+- **Testing** ← Unit_Tests — approach and tools
+- **Contributing** ← Code_Exemplars, copilot-instructions
+- **Environment variables** ← Environment_Variables, `.env.example`, code — one row per var, with
+  default if available
 
-- Optimize for a new developer getting the project running and making a safe first change.
-- Use exact commands and relative links.
-- Prefer concise tables for structured information.
-- Never expose secret values or present example credentials as real defaults.
-- If required information is unavailable, omit the claim or state that it is not documented.
-- Keep the README concise; link to detailed repository documentation instead of duplicating it.
+Keep it concise: what a new developer or user needs to know.
