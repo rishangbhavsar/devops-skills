@@ -38,6 +38,14 @@ running code.
     having an agent follow the prompt and grading the transcript against the assertions.
   - `README.md` — install instructions and design rationale; keep in sync with SKILL.md/PROTOCOL.md
     if triggering conditions or store layout change.
+- `html-plan-report/` — multi-file skill. Writes a coding task's plan as an HTML page under
+  `.plan/` in the target repo, settles decisions via AskUserQuestion, gates coding on approval.
+  - `SKILL.md` — workflow; `references/visual-guide.md` — diagram rules.
+  - `assets/` — `plan-template.html` / `plan-lite.html` plus shared `plan.css`/`plan.js`
+    (synced to `.plan/_assets/`, never inlined).
+  - `scripts/` — stdlib Python: `validate_plan.py`, `update_index.py` (builds `.plan/index.html`),
+    `bundle_plan.py` (single-file export). These are the only runnable code in the repo.
+  - `overwrite.example.md` — sample; users copy it to `overwrite.md` to override defaults.
 
 ## Conventions when editing a skill
 
